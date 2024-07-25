@@ -1,0 +1,17 @@
+{
+    "name": "paulo/curso_ferias",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Paulo Reis",
+            "email": "pauloreisprofissional@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}
