@@ -23,14 +23,14 @@ try {
             `p`.`descricao`, `p`.`preco`  from produtos AS `p` 
         INNER JOIN 
             categorias AS `c` ON `c`.`id` = `p`.`categoria_id`
+        WHERE `p`.`id` = 3
     ';
     $statement = $pdo->query($sql);
     
-    $produtos = $statement->fetchAll();
+    $produto = $statement->fetch();
 
-    foreach ($produtos as $produto) {
-        echo "O produto {$produto['nome']}, da categoria {$produto['categoria']}, custa R$ " . number_format($produto['preco'], 2, ',', '.') . "<br>";
-    }
+    echo "O produto {$produto['nome']}, da categoria {$produto['categoria']}, custa R$ " . number_format($produto['preco'], 2, ',', '.') . "<br>";
+    
 } catch (PDOException $exception) {
     die("Não foi possível se conectar com o banco de dados. Motivo: {$exception->getMessage()}");
 }
