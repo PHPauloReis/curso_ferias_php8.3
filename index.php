@@ -16,6 +16,8 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $user, $password, $options);
+
+    $id = $_GET['id'] ?? '';
     
     $sql = '
         SELECT 
@@ -23,14 +25,20 @@ try {
             `p`.`descricao`, `p`.`preco`  from produtos AS `p` 
         INNER JOIN 
             categorias AS `c` ON `c`.`id` = `p`.`categoria_id`
-        WHERE `p`.`id` = 3
+        WHERE `p`.`id` = :id
     ';
-    $statement = $pdo->query($sql);
+    $statement = $pdo->prepare($sql);
+    $statement->bindParam(':id', $id, PDO::PARAM_INT);
+    $statement->execute();
     
     $produto = $statement->fetch();
 
-    echo "O produto {$produto['nome']}, da categoria {$produto['categoria']}, custa R$ " . number_format($produto['preco'], 2, ',', '.') . "<br>";
-    
+    if ($produto) {
+        echo "O produto {$produto['nome']}, da categoria {$produto['categoria']}, custa R$ " . number_format($produto['preco'], 2, ',', '.') . "<br>";
+    } else {
+        echo "Não foi localizado nenhum produto com o id: {$id}";
+    }
+
 } catch (PDOException $exception) {
     die("Não foi possível se conectar com o banco de dados. Motivo: {$exception->getMessage()}");
 }
