@@ -1,56 +1,28 @@
 <?php
 
-$host = 'localhost';
-$db = 'curso_ferias';
-$user = 'root';
-$password = '';
-$charset = 'utf8mb4';
-
-$dsn = "mysql:host={$host};dbname={$db};charset={$charset}";
-
-$options = [
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_EMULATE_PREPARES => false
-];
+require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/funcoes/gerenciamento_produto.php';
 
 try {
     $pdo = new PDO($dsn, $user, $password, $options);
 
     $id = $_GET['id'] ?? '';
-    
-    // ========= GRAVAÇÃO
+
+    $idProdutoDeletar = $_GET['deletar'] ?? '';
+
+    if (!empty($idProdutoDeletar)) {
+        deletarProduto($pdo, $idProdutoDeletar);
+    }
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
         $nomeDoProduto = $_POST['nome'];
         $descricaoDoProduto = $_POST['descricao'];
         $precoDoProduto = $_POST['preco'];
 
-        $sql = "INSERT INTO produtos (nome, descricao, preco) VALUES (:nome, :descricao, :preco)";
-
-        $statement = $pdo->prepare($sql);
-        $statement->bindParam(':nome', $nomeDoProduto);
-        $statement->bindParam(':descricao', $descricaoDoProduto);
-        $statement->bindParam(':preco', $precoDoProduto);
-        $statement->execute();
-
+        cadastrarProduto($pdo, $nomeDoProduto, $descricaoDoProduto, $precoDoProduto);
     }
 
-
-    // ==================
-
-
-    $sql = '
-        SELECT 
-            `p`.`id`, `c`.`titulo` AS `categoria`, `p`.`nome`, 
-            `p`.`descricao`, `p`.`preco`  from produtos AS `p` 
-        LEFT JOIN 
-            categorias AS `c` ON `c`.`id` = `p`.`categoria_id`
-    ';
-    $statement = $pdo->query($sql);
-    
-    $produtos = $statement->fetchAll();
+    $produtos = obterTodosOsProdutos($pdo);
 
 } catch (PDOException $exception) {
     die("Não foi possível se conectar com o banco de dados. Motivo: {$exception->getMessage()}");
@@ -80,6 +52,7 @@ try {
                         <th>Nome do produto</th>
                         <th>Categoria do produto</th>
                         <th>Preço do produto</th>
+                        <th>Ação</th>
                     </tr>
 
                     <?php foreach($produtos as $produto): ?>
@@ -88,6 +61,10 @@ try {
                         <td><?php echo $produto['nome']; ?></td>
                         <td><?php echo $produto['categoria']; ?></td>
                         <td>R$ <?php echo number_format($produto['preco'], 2, ',', '.'); ?></td>
+                        <td>
+                            <a class="btn btn-primary btn-sm" href='atualizar.php?id=<?php echo $produto['id']; ?>'>Editar</a>
+                            <a onclick="confirmarDelecao('<?php echo $produto['id']; ?>')" class="btn btn-danger btn-sm" href='#'>Excluir</a>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
 
@@ -126,6 +103,16 @@ try {
         </div>
 
     </div>
+
+    <script>
+        
+    function confirmarDelecao(idProduto) {
+        if (confirm('Você tem certeza que deseja excluir este produto?')) {
+            window.location = `index.php?deletar=${idProduto}`;
+        }
+    }
+
+    </script>
     
 </body>
 </html>
