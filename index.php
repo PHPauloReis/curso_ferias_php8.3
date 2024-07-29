@@ -1,30 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
 require 'vendor/autoload.php';
 
+use App\Controllers\ProductsController;
 use App\Models\CategoryModel;
 use App\Models\ProductModel;
+use Psr\Http\Message\ServerRequestInterface;
+use League\Route\Router;
+use Psr\Http\Message\ResponseInterface;
 
-$categoryModel = new CategoryModel;
-$categoryModel->update(2, [
-    'titulo' => 'Eletro-domésticos e Portáteis'
-]);
+$request = Laminas\Diactoros\ServerRequestFactory::fromGlobals(
+    $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES
+);
 
-// $categoryModel = new CategoryModel;
-// $categoryModel->delete(7);
+$router = new Router;
 
-// $novoProduto = [
-//     'nome' => 'Celular S24+',
-//     'descricao' => 'Smartphone com 512GB',
-//     'preco' => 7999
-// ];
+$router->map('GET', '/', function (ServerRequestInterface $request): ResponseInterface {
+    $response = new Laminas\Diactoros\Response;
+    $response->getBody()->write('<h1>Hello, World!</h1>');
+    return $response;
+});
 
-// $productModel->insert($novoProduto);
+$router->map('GET', '/produtos', [new ProductsController(), 'index']);
 
-// var_dump($productModel->getAll());
-// var_dump($productModel->getById(3));
+$response = $router->dispatch($request);
 
-// $categoryModel = new CategoryModel;
-// var_dump($categoryModel->getAll());
+(new Laminas\HttpHandlerRunner\Emitter\SapiEmitter)->emit($response);
 
-// var_dump($categoryModel->getById(2));
