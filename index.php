@@ -5,17 +5,23 @@ require 'vendor/autoload.php';
 use App\Models\CategoryModel;
 use App\Models\ProductModel;
 
-$productModel = new ProductModel;
+$categoryModel = new CategoryModel;
+$categoryModel->update(2, [
+    'titulo' => 'Eletro-domésticos e Portáteis'
+]);
 
-$novoProduto = [
-    'nome' => 'Celular S24+',
-    'descricao' => 'Smartphone com 512GB',
-    'preco' => 7999
-];
+// $categoryModel = new CategoryModel;
+// $categoryModel->delete(7);
 
-$productModel->insert($novoProduto);
+// $novoProduto = [
+//     'nome' => 'Celular S24+',
+//     'descricao' => 'Smartphone com 512GB',
+//     'preco' => 7999
+// ];
 
-var_dump($productModel->getAll());
+// $productModel->insert($novoProduto);
+
+// var_dump($productModel->getAll());
 // var_dump($productModel->getById(3));
 
 // $categoryModel = new CategoryModel;

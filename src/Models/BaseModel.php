@@ -71,4 +71,38 @@ class BaseModel
 
         $statement->execute();
     }
+
+    public function update(int $id, array $data): void
+    {
+        $keys = array_keys($data);
+
+        $columns = array_map(function($key) {
+            return "{$key} = :{$key}";
+        }, $keys);
+        $columnsString = implode(", ", $columns);
+
+        $binds = array_map(function($key) {
+            return ":{$key}";
+        }, $keys);
+
+        $sql = "UPDATE {$this->table} SET {$columnsString} WHERE id = :id";
+
+        $statement = $this->pdo->prepare($sql);
+
+        for ($i = 0; $i < count($data); $i++) {
+            $statement->bindParam($binds[$i], $data[$keys[$i]]);
+        }
+
+        $statement->bindParam(':id', $id);
+
+        $statement->execute();
+    }
+
+    public function delete(int $id): void
+    {
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindParam(':id', $id);
+        $statement->execute();
+    }
 }
